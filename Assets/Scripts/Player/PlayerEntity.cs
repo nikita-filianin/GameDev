@@ -1,3 +1,6 @@
+using Cinemachine;
+using Core.Enums;
+using Core.Tools;
 using UnityEngine;
 
 namespace Player
@@ -8,7 +11,10 @@ namespace Player
     {
         [Header("HorizontalMovement")]
         [SerializeField] private float _horizontalSpeed;
-        [SerializeField] private bool _faceRight;
+        [SerializeField] private Direction _direction;
+        [SerializeField] private DirectionalCameraPair _cameras;
+        [SerializeField] private CinemachineVirtualCamera _endLvlCamera;
+        [SerializeField] private Camera _mainCamera;
 
         [Header("Jump")]
         public Transform groundCheck;
@@ -25,6 +31,7 @@ namespace Player
        private void Start()
         {
             _rigidbody = GetComponent<Rigidbody2D>();
+            _endLvlCamera.enabled = true;
         }
 
        private void Update()
@@ -35,6 +42,12 @@ namespace Player
            {
                _rigidbody.velocity = new Vector2(_rigidbody.velocity.x, jumpSpeed);
            }
+
+           if (_mainCamera.transform.position == _endLvlCamera.transform.position)
+           {
+               _endLvlCamera.enabled = false;
+           }
+               
        }
 
        public void MoveHorizontally(float direction)
@@ -48,15 +61,17 @@ namespace Player
 
         private void SetDirection(float direction)
         {
-            if ((_faceRight && direction < 0) ||
-            (!_faceRight && direction > 0))
+            if ((_direction == Direction.Right && direction < 0) ||
+            (_direction == Direction.Left && direction > 0))
             Flip();
         }
 
         private void Flip()
         {
             transform.Rotate(0, 180, 0);
-            _faceRight = !_faceRight;
+            _direction = _direction == Direction.Right ? Direction.Left : Direction.Right;
+            foreach (var cameraPair in _cameras.DirectionalCameras)
+                cameraPair.Value.enabled = cameraPair.Key == _direction;
         }
     }
 }
