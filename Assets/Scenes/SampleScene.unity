@@ -1062,8 +1062,8 @@ GameObject:
   - component: {fileID: 408050951}
   - component: {fileID: 408050950}
   - component: {fileID: 408050952}
-  - component: {fileID: 408050955}
   - component: {fileID: 408050956}
+  - component: {fileID: 408050955}
   - component: {fileID: 408050957}
   - component: {fileID: 408050958}
   m_Layer: 0
@@ -1174,8 +1174,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: e8aeabe02272ca24b8d92410f60a1c3c, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _horizontalSpeed: 5
-  _direction: 0
+  _directionalMovementData:
+    <HorizontalSpeed>k__BackingField: 6
+    <Direction>k__BackingField: 0
   _cameras:
     _rightCamera: {fileID: 1877405342}
     _leftCamera: {fileID: 7185369}

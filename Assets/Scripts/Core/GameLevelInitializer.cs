@@ -1,6 +1,10 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
+using Core.Services.Updater;
+using InputReader;
 using Player;
 using UnityEngine;
+
 namespace Core
 {
     public class GameLevelInitializer : MonoBehaviour
@@ -9,15 +13,25 @@ namespace Core
         [SerializeField] private GameUIInputView _gameUiInputView;
 
         private ExternalDevicesInputReader _externalDevicesInput;
+        private PlayerSystem _playerSystem;
+        private ProjectUpdater _projectUpdater;
 
-        private PlayerBrain _playerBrain;
+        private List<IDisposable> _disposables;
 
         private bool _onPause;
 
         private void Awake()
         {
+            _disposables = new List<IDisposable>();
+            if (ProjectUpdater.Instance == null)
+                _projectUpdater = new GameObject().AddComponent<ProjectUpdater>();
+            else
+                _projectUpdater = ProjectUpdater.Instance as ProjectUpdater;
             _externalDevicesInput = new ExternalDevicesInputReader();
-            _playerBrain = new PlayerBrain(_playerEntity, new List<IEntityInputSource>() {
+            _disposables.Add(_externalDevicesInput);
+
+            _playerSystem = new PlayerSystem(_playerEntity, new List<IEntityInputSource>
+            {
                 _gameUiInputView,
                 _externalDevicesInput
             });
@@ -25,22 +39,19 @@ namespace Core
 
         private void Update()
         {
-            if (_onPause)
+            if (Input.GetKeyDown(KeyCode.Escape))
             {
-                return;
+                _projectUpdater.IsPaused = !_projectUpdater.IsPaused;
             }
-
-            _externalDevicesInput.OnUpdate();
         }
 
-        private void FixedUpdate()
+        private void OnDestroy()
         {
-            if (_onPause)
+            foreach (var disposable in _disposables)
             {
-                return;
+                disposable.Dispose();
             }
-
-            _playerBrain.OnFixedUpdate();
         }
+
     }
 }
