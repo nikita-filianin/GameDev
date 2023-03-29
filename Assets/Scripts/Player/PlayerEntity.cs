@@ -2,6 +2,7 @@ using Cinemachine;
 using Core.Enums;
 using Core.Tools;
 using UnityEngine;
+using UnityEngine.UIElements;
 
 namespace Player
 {
@@ -15,6 +16,7 @@ namespace Player
         [SerializeField] private DirectionalCameraPair _cameras;
         [SerializeField] private CinemachineVirtualCamera _endLvlCamera;
         [SerializeField] private Camera _mainCamera;
+        
 
         [Header("Jump")]
         public Transform groundCheck;
@@ -26,30 +28,33 @@ namespace Player
         private Rigidbody2D _rigidbody;
         private Rigidbody2D _player;
         private float _startJumpVerticalPosition;
-       
+
         // Start is called before the first frame update
        private void Start()
         {
             _rigidbody = GetComponent<Rigidbody2D>();
             _endLvlCamera.enabled = true;
         }
-
+       
        private void Update()
        {
            _isTouchingGround = Physics2D.OverlapCircle(groundCheck.position, groundCheckRadius, 
                groundLayer);
-           if (Input.GetButtonDown("Jump") && _isTouchingGround)
-           {
-               _rigidbody.velocity = new Vector2(_rigidbody.velocity.x, jumpSpeed);
-           }
 
            if (_mainCamera.transform.position == _endLvlCamera.transform.position)
            {
                _endLvlCamera.enabled = false;
            }
-               
        }
-
+       
+       public void Jump()
+       {
+           if (_isTouchingGround)
+           {
+               _isTouchingGround = false;
+               _rigidbody.velocity = new Vector2(_rigidbody.velocity.x, jumpSpeed);
+           }
+       }
        public void MoveHorizontally(float direction)
         {
             SetDirection(direction);
